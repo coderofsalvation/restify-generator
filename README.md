@@ -12,6 +12,7 @@ Installation
 ============
 
     git clone https://github.com/coderofsalvation/restify-generator.git
+    cd restify-generator
     npm install restify
     cd bin
     ./generate myserver data/schema.json data/server.template > server
