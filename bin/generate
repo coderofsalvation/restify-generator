@@ -1,0 +1,28 @@
+#!/usr/bin/node
+
+if( process.argv.length != 5 ){
+  console.log("Usage: ./generate <servername> <data/schema.json> <data/server.template> > server");
+  process.exit(1);
+}
+
+var name      = process.argv[2];
+var schema    = require( '../'+process.argv[3] );
+var servertpl = process.argv[4];
+
+// outputting server template
+var exec = require('child_process').exec;
+var child = exec('cat '+servertpl+' | sed "s/myRestServer/'+name+'/g"', function( error, stdout, stderr)  {
+  if ( error != null ) console.log(stderr);
+  console.log(stdout);
+  for( endpoint in schema.endpoints ){
+    var endpointObj = schema.endpoints[endpoint];
+    var name = endpointObj.name;
+    for( method in endpointObj.methods ){
+      var methodObj = endpointObj.methods[method];
+      var type      = methodObj.HTTPMethod.toLowerCase();
+      console.log( "/***\n * "+methodObj.HTTPMethod+" "+methodObj.URI+"\n *\n * "+methodObj.Synopsis+"\n */");
+      console.log( "server."+type+"('"+ methodObj.URI + "', function(req, res, next ){\n\n}\n");
+    }
+  }
+});
+

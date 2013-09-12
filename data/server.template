@@ -1,0 +1,21 @@
+#!/usr/bin/node
+/**
+ * Restify RESTserver
+ * 
+ * usage: chmod 755 server; ./server
+ * how to test: curl -is http://localhost:8001/hello/mark -H 'accept: text/plain'
+ */
+
+var restify = require('restify');
+
+function notImplemented(req, res, next) {
+  res.send('not implemented ' + req.params.name);
+}
+
+var server = restify.createServer({
+  name: 'myRestServer',
+});
+
+server.listen(8001, function() {
+  console.log('%s listening at %s', server.name, server.url);
+});
