@@ -21,7 +21,7 @@ var child = exec('cat ../'+servertpl+' | sed "s/myRestServer/'+name+'/g"', funct
       var methodObj = endpointObj.methods[method];
       var type      = methodObj.HTTPMethod.toLowerCase();
       console.log( "/***\n * "+methodObj.HTTPMethod+" "+methodObj.URI+"\n *\n * "+methodObj.Synopsis+"\n */");
-      console.log( "server."+type+"('"+ methodObj.URI + "', function(req, res, next ){\n\n}\n");
+      console.log( "server."+type+"('"+ methodObj.URI + "', function(req, res, next ){\n\n});\n");
     }
   }
 });
