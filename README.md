@@ -19,3 +19,7 @@ Installation
     myserver listening on 8001
 
 Voila!
+
+How to design a REST schema
+===========================
+look (https://github.com/coderofsalvation/restify-generator/blob/master/data/schema.json)[here]
