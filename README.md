@@ -16,6 +16,7 @@ Installation
     npm install restify
     cd bin
     ./generate myserver data/schema.json data/server.template > server
+    chmod 755 server
     ./server
     myserver listening on 8001
 
