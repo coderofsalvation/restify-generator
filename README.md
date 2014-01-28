@@ -37,8 +37,9 @@ I used this bashscript to quickly generate/update my API with several versions:
 
     serverfile="$mypath/server"
 
-    # clone restify-generator if not exists
+    # clone restify-generator if not exists and install restify if not installed
     [[ ! -d "$mypath/restify-generator" ]] && git clone https://github.com/coderofsalvation/restify-generator.git 
+    [[ ! -d "node_modules"              ]] && npm install restify
 
     generateVersion(){
       version="$1"
