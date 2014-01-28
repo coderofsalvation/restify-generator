@@ -1,28 +1,53 @@
 #!/usr/bin/node
+var path = require('path')
+var fs = require('fs');
 
-if( process.argv.length != 5 ){
-  console.log("Usage: ./generate <servername> <data/schema.json> <data/server.template> > server");
+if( process.argv.length != 6 ){
+  console.log("Usage: ./generate <servername> <data/schema.json> <data/server.template> <outfile>");
   process.exit(1);
 }
 
-var name      = process.argv[2];
-var schema    = require( '../'+process.argv[3] );
+var servername      = process.argv[2];
+var schema    = require( process.argv[3] );
 var servertpl = process.argv[4];
+var outfile   = process.argv[5];
 
 // outputting server template
 var exec = require('child_process').exec;
-var child = exec('cat ../'+servertpl+' | sed "s/myRestServer/'+name+'/g"', function( error, stdout, stderr)  {
+var child = exec('cat '+servertpl+' | sed "s/myRestServer/'+servername+'/g"', function( error, stdout, stderr)  {
   if ( error != null ) console.log(stderr);
-  console.log(stdout);
+  var code =  stdout;
   for( endpoint in schema.endpoints ){
     var endpointObj = schema.endpoints[endpoint];
     var name = endpointObj.name;
     for( method in endpointObj.methods ){
       var methodObj = endpointObj.methods[method];
       var type      = methodObj.HTTPMethod.toLowerCase();
-      console.log( "/***\n * "+methodObj.HTTPMethod+" "+methodObj.URI+"\n *\n * "+methodObj.Synopsis+"\n */");
-      console.log( "server."+type+"('"+ methodObj.URI + "', function(req, res, next ){\n\n});\n");
+      var impl      = "";      
+      implfile = "RESTresources"+methodObj.URI+".js";
+      code +=  "\nserver."+type+"('"+ methodObj.URI + "', function(req, res, next ){\n";
+      code +=  "  require('./"+implfile+"').handle( req, res, next, "+servername+" );\n" ;
+      code +=  "});\n";
+      impl +=  "\n/***\n * "+methodObj.HTTPMethod+" "+methodObj.URI+"\n *\n * "+methodObj.Synopsis+"\n";
+      impl +=  " */\n\n";
+      impl +=  "function handle(req, res, next, "+servername+" ){\n"
+      for( parameter in methodObj.parameters )
+        impl += "  var "+parameter+" = req.query."+parameter+"; // ("+ methodObj.parameters[parameter].type + ")  " +
+                       methodObj.parameters[parameter].info + "\n";
+      impl += "  var response  = "+servername+".response;\n";
+      impl += "  var code = response.code = 0;\n";
+      impl += "  response.message = "+servername+".codes[code]; response.data = req.query;";
+      impl += "  res.send( response );\n";                       
+      impl += "}\n\nmodule.exports.handle = handle;";
+      implfile = "../../../src/"+implfile; // *FIXME* dirty hack
+      console.log(implfile );
+      if( ! fs.exists( implfile ) ) fs.writeFile( implfile, impl, function(err){} );
+      else console.log("skipping "+implfile+" (already existed)");
     }
   }
+  fs.writeFile( outfile, code, function (err) {
+      if (err) throw err;
+      console.log('done');
+  });
 });
 
