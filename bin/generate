@@ -2,15 +2,16 @@
 var path = require('path')
 var fs = require('fs');
 
-if( process.argv.length != 6 ){
-  console.log("Usage: ./generate <servername> <data/schema.json> <data/server.template> <outfile>");
+if( process.argv.length != 7 ){
+  console.log("Usage: ./generate <servername> <data/schema.json> <data/server.template> <outfile> <resourcedir>");
   process.exit(1);
 }
 
 var servername      = process.argv[2];
-var schema    = require( process.argv[3] );
-var servertpl = process.argv[4];
-var outfile   = process.argv[5];
+var schema          = require( process.argv[3] );
+var servertpl       = process.argv[4];
+var outfile         = process.argv[5];
+var resdir          = process.argv[6];
 
 // outputting server template
 var exec = require('child_process').exec;
@@ -39,7 +40,7 @@ var child = exec('cat '+servertpl+' | sed "s/myRestServer/'+servername+'/g"', fu
       impl += "  response.message = "+servername+".codes[code]; response.data = req.query;";
       impl += "  res.send( response );\n";                       
       impl += "}\n\nmodule.exports.handle = handle;";
-      implfile = "../../../src/"+implfile; // *FIXME* dirty hack
+      implfile = resdir+"/"+implfile; 
       console.log(implfile );
       if( ! fs.exists( implfile ) ) fs.writeFile( implfile, impl, function(err){} );
       else console.log("skipping "+implfile+" (already existed)");
