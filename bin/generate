@@ -25,7 +25,7 @@ var child = exec('cat '+servertpl+' | sed "s/myRestServer/'+servername+'/g"', fu
       var methodObj = endpointObj.methods[method];
       var type      = methodObj.HTTPMethod.toLowerCase();
       var impl      = "";      
-      implfile = "RESTresources"+methodObj.URI+".js";
+      implfile = resdir+methodObj.URI+".js";
       code +=  "\nserver."+type+"('"+ methodObj.URI + "', function(req, res, next ){\n";
       code +=  "  require('./"+implfile+"').handle( req, res, next, "+servername+" );\n" ;
       code +=  "});\n";
@@ -40,9 +40,8 @@ var child = exec('cat '+servertpl+' | sed "s/myRestServer/'+servername+'/g"', fu
       impl += "  response.message = "+servername+".codes[code]; response.data = req.query;";
       impl += "  res.send( response );\n";                       
       impl += "}\n\nmodule.exports.handle = handle;";
-      implfile = resdir+"/"+implfile; 
       console.log(implfile );
-      if( ! fs.exists( implfile ) ) fs.writeFile( implfile, impl, function(err){} );
+      if( ! fs.exists( "../"+implfile ) ) fs.writeFile( "../"+implfile, impl, function(err){} );
       else console.log("skipping "+implfile+" (already existed)");
     }
   }

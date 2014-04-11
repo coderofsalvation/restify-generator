@@ -14,10 +14,10 @@ Installation
     git clone https://github.com/coderofsalvation/restify-generator.git
     cd restify-generator
     npm install restify
+    mkdir api
     cd bin
-    ./generate myserver data/schema.json data/server.template > server
-    chmod 755 server
-    ./server
+    ./generate serverapi ../data/schema.json ../data/server.template ../serverapi.js api
+    node serverapi.js
     myserver listening on 8001
 
 Voila!
